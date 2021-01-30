@@ -7,8 +7,8 @@ session_start();
     $user_data = check_login($con);
     $user_name = $user_data['user_name'];
 
-    $all_freelancers_query = "select * from users where user_role = 'freelancer'";
-    $all_freelancers = mysqli_query($con, $all_freelancers_query);
+    $my_jobs_query = "select * from jobs where client_name = '$user_name'";
+    $my_jobs = mysqli_query($con, $my_jobs_query);
 
     if($user_data['user_role'] == 'freelancer') {
       header('Location: index-freelancer.php');
@@ -71,9 +71,9 @@ session_start();
       <nav class="nav-menu d-none d-lg-block">
         <ul>
           <li><a href="index-guest.php">Home</a></li>
-          <li><a href="my-jobs.php">My Jobs</a></li>
+          <li class="active"><a href="my-jobs.php">My Jobs</a></li>
           <li><a href="new-job.php">Add New Job</a></li>
-          <li class="active"><a href="top-freelancers.php">Top Freelancers</a></li>
+          <li><a href="top-freelancers.php">Top Freelancers</a></li>
           <li><a href="balance.php">Balance</a></li>
           <li><a><?php echo $user_data['user_role']; ?>: <?php echo $user_data['user_name']; ?></a></li>
           <li><a href="logout.php" style="color: red;">Logout</a></li>
@@ -83,62 +83,26 @@ session_start();
     </div>
   </header><!-- End Header -->
 
-
   <section style="margin-top: 80px;">
-    <div class="container mt-5">
+  <div class="container mt-5">
       <div class="mt-3 bg-light">
-        <?php
-            if($_SERVER['REQUEST_METHOD'] == "POST") {
-              $freelancer_name = rtrim($_POST['user_name'], "/");
-              $freelancer_phone = rtrim($_POST['phone'], "/");
-              $freelancer_email = rtrim($_POST['email'], "/");
-              $money_after = $user_data['balance'] - 1;
-              
-              if($user_data['balance'] >= 1) {
-
-                $client_money_query = "update users set balance = '$money_after' where user_name = '$user_name'";
-                $client_result = mysqli_query($con, $client_money_query);
-
-                if($client_result) {
-                  echo "<h2 class='text-center'>Freelancer Contact Info: </h2>";
-                  echo "<h4>Freelancer Name: " . $freelancer_name . "</h4>";
-                  echo "<h4>Phone Number: 0" . $freelancer_phone . "</h4>";
-                  echo "<h4>Email Address: ", $freelancer_email, "</h4>";
-                } else {
-                    echo "error submitting question";
-                }
-
-              }else {
-                  echo "you don't have enough money to submit the question!";
-              }
-              
-            }
-          ?>
-      </div>
-      <div class="mt-3 bg-light">
-          <h2 class="text-center">Top Freelancers</h2>
-          <p class="text-center">(Showing Contact Info costs you 1$)</p>
+          <h2 class="text-center">My Jobs</h2>
           <?php
               print "
               <table class='table table-striped'>
               <tr>
-              <td>Freelancer Name</td> 
+              <td>Title</td> 
               <td>Work Type</td> 
-              <td>Hire This Freelancer</td> 
+              <td>Experience Level</td> 
+              <td>Budget</td> 
               </tr>";
-              while($row = mysqli_fetch_array($all_freelancers))
+              while($row = mysqli_fetch_array($my_jobs))
               {
                   print "<tr>"; 
-                  print "<td>" . $row['user_name'] . "</td>"; 
+                  print "<td><a href='job.php?job_id=". $row['id'] ."'>" . $row['title'] . "</a></td>"; 
                   print "<td>" . $row['work_type'] . "</td>"; 
-                  print "<td>
-                        <form method='post'>
-                            <input type='hidden' name='user_name' value=" . $row['user_name'] . "/>
-                            <input type='hidden' name='phone' value=" . $row['phone'] . "/>
-                            <input type='hidden' name='email' value=" . $row['email'] . "/>
-                            <input id='button' type='submit' class='btn btn-primary' value='Show Contact Info'><br><br>
-                        </form>
-                    </td>"; 
+                  print "<td>" . $row['experience'] . "</td>"; 
+                  print "<td>" . $row['budget'] . "</td>"; 
                   print "</tr>";
               } 
               print "</table>";

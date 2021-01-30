@@ -7,13 +7,13 @@ session_start();
     $user_data = check_login($con);
     $user_name = $user_data['user_name'];
 
-    $all_freelancers_query = "select * from users where user_role = 'freelancer'";
-    $all_freelancers = mysqli_query($con, $all_freelancers_query);
+    $job_id = $_GET['job_id'];
 
-    if($user_data['user_role'] == 'freelancer') {
-      header('Location: index-freelancer.php');
-    }
+    $single_job_query = "select * from jobs where id = '$job_id'";
+    $result = mysqli_query($con, $single_job_query);
+    $single_job = mysqli_fetch_assoc($result);
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -69,11 +69,10 @@ session_start();
       <h1 class="logo mr-auto"><a href="index-guest.php">LOGO<span>.</span></a></h1>
 
       <nav class="nav-menu d-none d-lg-block">
-        <ul>
+      <ul>
           <li><a href="index-guest.php">Home</a></li>
-          <li><a href="my-jobs.php">My Jobs</a></li>
-          <li><a href="new-job.php">Add New Job</a></li>
-          <li class="active"><a href="top-freelancers.php">Top Freelancers</a></li>
+          <li><a href="my-jobs.php">Recommended Jobs</a></li>
+          <li><a href="top-clients.php">Top Clients</a></li>
           <li><a href="balance.php">Balance</a></li>
           <li><a><?php echo $user_data['user_role']; ?>: <?php echo $user_data['user_name']; ?></a></li>
           <li><a href="logout.php" style="color: red;">Logout</a></li>
@@ -83,68 +82,47 @@ session_start();
     </div>
   </header><!-- End Header -->
 
-
-  <section style="margin-top: 80px;">
-    <div class="container mt-5">
-      <div class="mt-3 bg-light">
-        <?php
-            if($_SERVER['REQUEST_METHOD'] == "POST") {
-              $freelancer_name = rtrim($_POST['user_name'], "/");
-              $freelancer_phone = rtrim($_POST['phone'], "/");
-              $freelancer_email = rtrim($_POST['email'], "/");
-              $money_after = $user_data['balance'] - 1;
-              
-              if($user_data['balance'] >= 1) {
-
-                $client_money_query = "update users set balance = '$money_after' where user_name = '$user_name'";
-                $client_result = mysqli_query($con, $client_money_query);
-
-                if($client_result) {
-                  echo "<h2 class='text-center'>Freelancer Contact Info: </h2>";
-                  echo "<h4>Freelancer Name: " . $freelancer_name . "</h4>";
-                  echo "<h4>Phone Number: 0" . $freelancer_phone . "</h4>";
-                  echo "<h4>Email Address: ", $freelancer_email, "</h4>";
-                } else {
-                    echo "error submitting question";
-                }
-
-              }else {
-                  echo "you don't have enough money to submit the question!";
-              }
-              
-            }
-          ?>
-      </div>
-      <div class="mt-3 bg-light">
-          <h2 class="text-center">Top Freelancers</h2>
-          <p class="text-center">(Showing Contact Info costs you 1$)</p>
-          <?php
-              print "
-              <table class='table table-striped'>
-              <tr>
-              <td>Freelancer Name</td> 
-              <td>Work Type</td> 
-              <td>Hire This Freelancer</td> 
-              </tr>";
-              while($row = mysqli_fetch_array($all_freelancers))
-              {
-                  print "<tr>"; 
-                  print "<td>" . $row['user_name'] . "</td>"; 
-                  print "<td>" . $row['work_type'] . "</td>"; 
-                  print "<td>
-                        <form method='post'>
-                            <input type='hidden' name='user_name' value=" . $row['user_name'] . "/>
-                            <input type='hidden' name='phone' value=" . $row['phone'] . "/>
-                            <input type='hidden' name='email' value=" . $row['email'] . "/>
-                            <input id='button' type='submit' class='btn btn-primary' value='Show Contact Info'><br><br>
-                        </form>
-                    </td>"; 
-                  print "</tr>";
-              } 
-              print "</table>";
-          ?>
-      </div>
-      <a href="new-job.php" type="button" class="btn btn-primary">Add New Job</a>
+  <section style="margin-top: 100px;">
+  <div class="container" style="max-width: 800px;">
+        <h1 class="text-center"><?php echo $single_job['title']?></h1> 
+        <table class="table">
+    <thead>
+      <tr>
+        <th style="width:150px;">Info</th>
+        <th>Data</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Client name</td>
+        <td><?php echo $single_job['client_name']?></td>
+      </tr>
+      <tr>
+        <td>Budget</td>
+        <td><?php echo $single_job['budget']?></td>
+      </tr>
+      <tr>
+        <td>Type of work</td>
+        <td><?php echo $single_job['work_type']?></td>
+      </tr>
+      <tr>
+        <td>Experience required</td>
+        <td><?php echo $single_job['experience']?></td>
+      </tr>
+      <tr>
+        <td>Job duration</td>
+        <td><?php echo $single_job['length']?></td>
+      </tr>
+      <tr>
+        <td>Job description</td>
+        <td><?php echo $single_job['description']?></td>
+      </tr>
+      <tr>
+        <td>Date posted</td>
+        <td><?php echo $single_job['date']?></td>
+      </tr>
+    </tbody>
+  </table>
     </div>
   </section>
   </main>
