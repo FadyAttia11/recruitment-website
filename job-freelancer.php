@@ -71,7 +71,7 @@ session_start();
       <nav class="nav-menu d-none d-lg-block">
       <ul>
           <li><a href="index-guest.php">Home</a></li>
-          <li><a href="my-jobs.php">Recommended Jobs</a></li>
+          <li><a href="recommended-jobs.php">Recommended Jobs</a></li>
           <li><a href="top-clients.php">Top Clients</a></li>
           <li><a href="balance.php">Balance</a></li>
           <li><a><?php echo $user_data['user_role']; ?>: <?php echo $user_data['user_name']; ?></a></li>

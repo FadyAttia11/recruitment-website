@@ -90,8 +90,8 @@ session_start();
       </h1>
       <h2>Find the most talented people to do your work or be the talented one yourself</h2>
       <div class="d-flex">
-        <a href="login.php" class="btn-get-started scrollto">Hire Talents</a>
-        <a href="login.php" class="btn-get-started scrollto ml-3">Find Jobs</a>
+        <a href="recommended-jobs.php" class="btn-get-started scrollto">Recommended Jobs</a>
+        <a href="top-clients.php" class="btn-get-started scrollto ml-3">Top Clients</a>
       </div>
     </div>
   </section><!-- End Hero -->

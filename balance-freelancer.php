@@ -136,6 +136,7 @@ session_start();
                 </div>
                 <input id="button" type="submit" class="btn btn-primary" value="Transfer Money">
             </form>
+            <img src="uploads/<?php echo $profile_pic; ?>" alt="">
         </div>
       </div>
     </div>

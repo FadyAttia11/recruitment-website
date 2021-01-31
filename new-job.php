@@ -7,9 +7,6 @@ session_start();
     $user_data = check_login($con);
     $user_name = $user_data['user_name'];
 
-    $my_jobs_query = "select * from jobs where client_name = '$user_name'";
-    $my_jobs = mysqli_query($con, $my_jobs_query);
-
     if($user_data['user_role'] == 'freelancer') {
       header('Location: index-freelancer.php');
     }
@@ -42,6 +39,7 @@ session_start();
 
   <!-- Template Main CSS File -->
   <link href="assets/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -131,36 +129,36 @@ session_start();
             </div>
         </div>
         <div class="form-group">
-            <label for="description">Project Description:</label>
+            <label for="description">Project Description: (letters, numbers, and dots are only allowed)</label>
             <textarea class="form-control" rows="5" id="description" name="description"></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Post Job</button>
-        <?php
-            if($_SERVER['REQUEST_METHOD'] == "POST") {
-                $title = $_POST['title'];
-                $budget = $_POST['budget'];
-                $work_type = $_POST['worktype'];
-                $experience = $_POST['experience'];
-                $length = $_POST['length'];
-                $description = $_POST['description'];
-
-                if(!empty($title) && !empty($budget) && !empty($work_type) && !empty($experience) && !empty($length) && !empty($description)) {
-                    //save to database
-                    $query = "insert into jobs (client_name,title,budget,work_type,experience,length,description) values ('$client_name','$title','$budget','$work_type','$experience','$length','$description')";
-                    $result = mysqli_query($con, $query);
-                    if($result) {
-                        // $id = $result['id'];
-                        // $job_id_query = "update single_job set job_id = '$id' where id = 1";
-                        // $job_id = mysqli_query($con, $id);
-                        header('Location: index-client.php');
-                        // echo "Successfully submitted your job";
-                    } else {
-                        echo "Please enter some valid information";
-                    }
-                }
-            }
-        ?>
     </form>
+    <?php
+      if($_SERVER['REQUEST_METHOD'] == "POST") {
+        $title = $_POST['title'];
+        $budget = $_POST['budget'];
+        $work_type = $_POST['worktype'];
+        $experience = $_POST['experience'];
+        $length = $_POST['length'];
+        $description = $_POST['description'];
+
+        if(!empty($title) && !empty($budget) && !empty($work_type) && !empty($experience) && !empty($length) && !empty($description)) {
+            //save to database
+            $query = "insert into jobs (client_name,title,budget,work_type,experience,length,description) values ('$user_name','$title','$budget','$work_type','$experience','$length','$description')";
+            $result = mysqli_query($con, $query);
+            if($result) {
+                // $id = $result['id'];
+                // $job_id_query = "update single_job set job_id = '$id' where id = 1";
+                // $job_id = mysqli_query($con, $id);
+                // header('Location: my-jobs.php');
+                echo "Successfully submitted your job";
+            } else {
+                echo "Please enter some valid information";
+            }
+        }
+      }
+    ?>
     </div>
   </section>
   </main>

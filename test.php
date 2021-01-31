@@ -1,3 +1,34 @@
+<?php
+  print "
+  <table class='table table-striped'>
+  <tr>
+  <td>Freelancer Name</td> 
+  <td>Work Type</td> 
+  <td>Hire This Freelancer</td> 
+  </tr>";
+  while($row = mysqli_fetch_array($all_freelancers))
+  {
+      print "<tr>"; 
+      print "<td>" . $row['user_name'] . "</td>"; 
+      print "<td>" . $row['work_type'] . "</td>"; 
+      print "<td>
+            <form method='post'>
+                <input type='hidden' name='user_name' value=" . $row['user_name'] . "/>
+                <input type='hidden' name='phone' value=" . $row['phone'] . "/>
+                <input type='hidden' name='email' value=" . $row['email'] . "/>
+                <input id='button' type='submit' class='btn btn-primary' value='Show Contact Info'><br><br>
+            </form>
+        </td>"; 
+      print "</tr>";
+  } 
+  print "</table>";
+?>
+
+
+
+
+
+
 
 <!DOCTYPE html>
 <html lang="en">

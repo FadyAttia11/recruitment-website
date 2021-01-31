@@ -3,6 +3,88 @@ session_start();
 
     include("connection.php");
     include("functions.php");
+
+    $error_msg = "";
+    $profile_pic = "";
+
+    if($_SERVER['REQUEST_METHOD'] == "POST") {
+        //something was posted
+        $first_name = $_POST['firstname'];
+        $last_name = $_POST['lastname'];
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+        $user_name = $_POST['username'];
+        $phone = $_POST['phone'];
+        $work_type = $_POST['worktype'];
+        $user_role = $_POST['user_role'];;
+
+        $salt1 = "qm&h*";
+        $salt2 = "pg!@";
+        $hashed_password = hash('ripemd128', "$salt1$password$salt2"); //hashing the plain text password
+
+        $target_dir = "uploads/";
+        $target_file = $target_dir . time() . basename($_FILES["fileToUpload"]["name"]);
+        $uploadOk = 1;
+        $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+
+        // Check if image file is a actual image or fake image
+        if(isset($_POST["submit"])) {
+            $check = getimagesize($_FILES["fileToUpload"]["tmp_name"]);
+            if($check !== false) {
+                echo "File is an image - " . $check["mime"] . ".";
+                $uploadOk = 1;
+            } else {
+                echo "File is not an image.";
+                $uploadOk = 0;
+            }
+        }
+
+        // Check file size
+        if ($_FILES["fileToUpload"]["size"] > 500000) {
+            echo "Sorry, your file is too large.";
+            $uploadOk = 0;
+        }
+
+        // Allow certain file formats
+        if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+            && $imageFileType != "gif" ) {
+            echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+            $uploadOk = 0;
+        }
+
+        // Check if $uploadOk is set to 0 by an error
+        if ($uploadOk == 0) {
+            echo "Sorry, your file was not uploaded.";
+            // if everything is ok, try to upload file
+            } else {
+            if (move_uploaded_file($_FILES["fileToUpload"]["tmp_name"], $target_file)) {
+                $profile_pic = time() . basename($_FILES["fileToUpload"]["name"]);
+                echo "The file ". htmlspecialchars( basename( $_FILES["fileToUpload"]["name"])). " has been uploaded.";
+            } else {
+                echo "Sorry, there was an error uploading your file.";
+            }
+        }
+        
+        if(!empty($first_name) && !empty($last_name) && !empty($email) && !empty($hashed_password) && !empty($user_name) && !empty($phone) && !empty($work_type) && !empty($user_role)) {
+            //save to database
+            $user_id = random_num(20);
+            $query = "insert into users (user_id,firstname,lastname,email,password,user_name,phone,work_type,user_role,profile_pic) values ('$user_id','$first_name','$last_name','$email', '$hashed_password','$user_name','$phone','$work_type','$user_role','$profile_pic')";
+
+            $result = mysqli_query($con, $query);
+            if($result) {
+                $_SESSION['user_id'] = $user_id;
+                if($user_role === 'client') {
+                    header('Location: index-client.php');
+                } else if($user_role === 'freelancer') {
+                    header('Location: index-freelancer.php');
+                }
+            } else {
+                $error_msg =  "username is already taken!";
+            }
+        } else {
+                $error_msg =  "Please enter some valid information";
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -75,7 +157,7 @@ session_start();
     <section style="margin-top: 100px;">
     <div class="container mt-3" style="max-width: 700px;">
         <h3>SIGN UP</h3>
-        <form method="post" class="needs-validation" novalidate>
+        <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
         <div class="row mb-3">
         <div class="col">
             <input type="text" class="form-control" id="firstname" placeholder="First Name" name="firstname" required>
@@ -100,6 +182,8 @@ session_start();
             <input type="number" class="form-control" placeholder="Phone Number" name="phone" required>
         </div>
         </div>
+        <label for="fileToUpload">Upload Profile Picture: </label>
+        <input type="file" name="fileToUpload" id="fileToUpload" required>
         <div class="form-group">
             <label for="worktype">What type of work?</label>
             <select class="form-control" id="worktype" name="worktype">
@@ -123,46 +207,8 @@ session_start();
         </div>
 
         <button type="submit" class="btn btn-primary">Register</button>
-        already have an account? <a href="login.php">login</a>
-        <?php
-            if($_SERVER['REQUEST_METHOD'] == "POST") {
-                //something was posted
-                $first_name = $_POST['firstname'];
-                $last_name = $_POST['lastname'];
-                $email = $_POST['email'];
-                $password = $_POST['password'];
-                $user_name = $_POST['username'];
-                $phone = $_POST['phone'];
-                $work_type = $_POST['worktype'];
-                $user_role = $_POST['user_role'];;
-
-                $salt1 = "qm&h*";
-                $salt2 = "pg!@";
-                $hashed_password = hash('ripemd128', "$salt1$password$salt2"); //hashing the plain text password
-                
-                if(!empty($first_name) && !empty($last_name) && !empty($email) && !empty($hashed_password) && !empty($user_name) && !empty($phone) && !empty($work_type) && !empty($user_role)) {
-                    //save to database
-                    $user_id = random_num(20);
-                    $query = "insert into users (user_id,firstname,lastname,email,password,user_name,phone,work_type,user_role) values ('$user_id','$first_name','$last_name','$email', '$hashed_password','$user_name','$phone','$work_type','$user_role')";
-
-                    $result = mysqli_query($con, $query);
-                    if($result) {
-                    $_SESSION['user_id'] = $user_id;
-                    if($user_role === 'client') {
-                        header('Location: client-home.php');
-                    } else if($user_role === 'freelancer') {
-                        header('Location: freelancer-home.php');
-                    }
-                    header('Location: client-home.php');
-                    }else {
-                        echo "username is already taken!";
-                    }
-                    die;
-                }else {
-                    echo "Please enter some valid information";
-                }
-            }
-        ?>
+        already have an account? <a href="login.php">login</a><br>
+        <?php echo $error_msg ?>
         </form>
     </div>
     </section>

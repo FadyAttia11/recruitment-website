@@ -6,6 +6,7 @@ session_start();
 
     $user_data = check_login($con);
     $user_name = $user_data['user_name'];
+    $profile_pic = $user_data['profile_pic'];
 
     $all_clients_query = "select * from users where user_role = 'client'";
     $all_clients = mysqli_query($con, $all_clients_query);
@@ -108,7 +109,7 @@ session_start();
                 }
 
               }else {
-                  echo "you don't have enough money to submit the question!";
+                  echo "you don't have enough money to show contact info!";
               }
               
             }
@@ -117,33 +118,29 @@ session_start();
       <div class="mt-3 bg-light">
           <h2 class="text-center">Top Clients</h2>
           <p class="text-center">(Showing Contact Info costs you 1$)</p>
-          <?php
-              print "
-              <table class='table table-striped'>
-              <tr>
-              <td>Client Name</td> 
-              <td>Main Work Type</td> 
-              <td>Work With This Client</td> 
-              </tr>";
-              while($row = mysqli_fetch_array($all_clients))
-              {
-                  print "<tr>"; 
-                  print "<td>" . $row['user_name'] . "</td>"; 
-                  print "<td>" . $row['work_type'] . "</td>"; 
-                  print "<td>
+
+          <div class="row">
+            <?php
+              while($row = mysqli_fetch_array($all_clients)) {
+                print "<div class='card col-5 mx-auto my-3' style='width:400px'>";
+                print "<div class='card-body'>";
+                print "<img class='card-img-top' src='uploads/". $row['profile_pic'] ."' alt='Profile Picture' style='width:100%'>";
+                print "<h4 class='card-title mt-3'>". $row['user_name'] ."</h4>";
+                print "<p class='card-text'>Type of Work: ". $row['work_type'] ."</p>";
+                print "<td>
                         <form method='post'>
                             <input type='hidden' name='user_name' value=" . $row['user_name'] . "/>
                             <input type='hidden' name='phone' value=" . $row['phone'] . "/>
                             <input type='hidden' name='email' value=" . $row['email'] . "/>
                             <input id='button' type='submit' class='btn btn-primary' value='Show Contact Info'><br><br>
                         </form>
-                    </td>"; 
-                  print "</tr>";
-              } 
-              print "</table>";
-          ?>
+                    </td>";
+                print "</div>";
+                print "</div>";
+              }
+            ?>
+          </div>
       </div>
-      <a href="new-job.php" type="button" class="btn btn-primary">Add New Job</a>
     </div>
   </section>
   </main>
